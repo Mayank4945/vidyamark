@@ -90,8 +90,24 @@ const StudentManagement: React.FC = () => {
       console.log('Fetching students for classId:', classId);
       const response = await api.getStudents(classId);
       console.log('API Response:', response.data);
-      const studentsData = response.data.data || [];
-      console.log('Students data:', studentsData);
+      const rawStudents = response.data.data || [];
+      
+      // Transform snake_case from database to camelCase for frontend
+      const studentsData = rawStudents.map((student: any) => ({
+        id: student.id,
+        rollNumber: student.roll_number,
+        firstName: student.first_name,
+        lastName: student.last_name,
+        fullName: `${student.first_name} ${student.last_name}`,
+        email: student.email,
+        phone: student.phone,
+        dateOfBirth: student.date_of_birth,
+        gender: student.gender,
+        parentName: student.parent_name,
+        parentContact: student.parent_contact
+      }));
+      
+      console.log('Transformed Students data:', studentsData);
       setStudents(studentsData);
     } catch (error: any) {
       console.error('Error fetching students:', error);
