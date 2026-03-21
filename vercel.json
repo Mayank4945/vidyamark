@@ -1,28 +1,16 @@
 {
   "version": 2,
-  "buildCommand": "cd backend && npm install && npm run build && cd ../frontend && npm install && npm run build",
+  "buildCommand": "cd frontend && npm install && npm run build",
   "env": {
-    "database_url": "@database_url",
-    "db_ssl": "@db_ssl"
+    "DATABASE_URL": "@database_url",
+    "DB_SSL": "@db_ssl",
+    "JWT_SECRET": "@jwt_secret",
+    "CORS_ORIGIN": "@cors_origin"
   },
-  "builds": [
-    {
-      "src": "backend/dist/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "frontend/out",
-      "use": "@vercel/static"
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "nodejs20.x",
+      "memory": 1024
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "backend/dist/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "frontend/out/$1"
-    }
-  ]
+  }
 }
