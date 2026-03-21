@@ -12,7 +12,9 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
   if (req.method === 'GET') {
     try {
-      const { studentId, examId, subjectId } = req.query;
+      const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : null;
+      const examId = req.query.examId ? parseInt(req.query.examId as string) : null;
+      const subjectId = req.query.subjectId ? parseInt(req.query.subjectId as string) : null;
       let sql = 'SELECT * FROM marks WHERE 1=1';
       const params: any[] = [];
 

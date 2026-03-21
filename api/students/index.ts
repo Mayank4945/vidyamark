@@ -12,7 +12,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
   if (req.method === 'GET') {
     try {
-      const { classId, schoolId } = req.query;
+      const classId = req.query.classId ? parseInt(req.query.classId as string) : null;
+      const schoolId = req.query.schoolId ? parseInt(req.query.schoolId as string) : null;
       let sql = 'SELECT * FROM students WHERE 1=1';
       const params: any[] = [];
 

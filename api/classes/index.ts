@@ -12,7 +12,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
   if (req.method === 'GET') {
     try {
-      const schoolId = req.query.schoolId;
+      const schoolId = req.query.schoolId ? parseInt(req.query.schoolId as string) : null;
       if (!schoolId) {
         return res.status(400).json({ error: 'schoolId is required' });
       }
