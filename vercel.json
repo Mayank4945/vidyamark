@@ -1,10 +1,4 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "nodejs@20.x",
-      "memory": 1024
-    }
-  }
+  "buildCommand": "cd frontend && npm install && npm run build"
 }
