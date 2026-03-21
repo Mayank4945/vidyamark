@@ -137,18 +137,35 @@ const StudentManagement: React.FC = () => {
       
       if (editingStudent) {
         // Update student
-        await api.updateStudent(editingStudent.id, {
-          ...data,
+        const updateData = {
+          schoolId: selectedSchool,
           classId: selectedClass,
-          schoolId: selectedSchool
-        });
+          rollNumber: data.rollNumber,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email || null,
+          phone: data.phone || null,
+          dateOfBirth: data.dateOfBirth || null,
+          gender: data.gender || null,
+          parentName: data.parentName || null,
+          parentContact: data.parentContact || null
+        };
+        await api.updateStudent(editingStudent.id, updateData);
         message.success('Student updated successfully');
       } else {
         // Create student
         const createData = {
-          ...data,
+          schoolId: selectedSchool,
           classId: selectedClass,
-          schoolId: selectedSchool
+          rollNumber: data.rollNumber,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email || null,
+          phone: data.phone || null,
+          dateOfBirth: data.dateOfBirth || null,
+          gender: data.gender || null,
+          parentName: data.parentName || null,
+          parentContact: data.parentContact || null
         };
         console.log('Creating student with data:', createData);
         await api.createStudent(createData);
