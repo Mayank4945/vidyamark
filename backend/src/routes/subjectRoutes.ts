@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { query } from '../database';
 import { authMiddleware } from '../middleware/auth';
 
@@ -7,7 +7,7 @@ const router = Router();
 /**
  * Get all subjects
  */
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req: Request, res: Response) => {
   try {
     const result = await query(
       `SELECT id, name, code, description
@@ -32,7 +32,7 @@ router.get('/', authMiddleware, async (req, res) => {
 /**
  * Create a new subject
  */
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { name, code, description } = req.body;
 
@@ -134,7 +134,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 /**
  * Seed default subjects (global, shared across all schools)
  */
-router.post('/seed', authMiddleware, async (req, res) => {
+router.post('/seed', authMiddleware, async (req: Request, res: Response) => {
   try {
     const defaultSubjects = [
       { name: 'Hindi', code: 'HINDI' },
@@ -148,7 +148,7 @@ router.post('/seed', authMiddleware, async (req, res) => {
       { name: 'Computer Application', code: 'COMPAPP' }
     ];
 
-    const createdSubjects = [];
+    const createdSubjects: any[] = [];
 
     for (const subject of defaultSubjects) {
       try {
