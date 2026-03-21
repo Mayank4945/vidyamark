@@ -38,11 +38,11 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     }
   } else if (req.method === 'POST') {
     try {
-      const { schoolId, classId, rollNumber, firstName, lastName, dateOfBirth, contactNumber, email } = req.body;
+      const { schoolId, classId, rollNumber, firstName, lastName, dateOfBirth, phone, email } = req.body;
       
       const result = await query(
-        'INSERT INTO students (school_id, class_id, roll_number, first_name, last_name, date_of_birth, contact_number, email) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-        [schoolId, classId, rollNumber, firstName, lastName, dateOfBirth || null, contactNumber || null, email || null]
+        'INSERT INTO students (school_id, class_id, roll_number, first_name, last_name, date_of_birth, phone, email) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+        [schoolId, classId, rollNumber, firstName, lastName, dateOfBirth || null, phone || null, email || null]
       );
       res.status(201).json({ success: true, data: result.rows[0] });
     } catch (error: any) {
@@ -50,10 +50,10 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     }
   } else if (req.method === 'PUT') {
     try {
-      const { id, firstName, lastName, dateOfBirth, contactNumber, email } = req.body;
+      const { id, firstName, lastName, dateOfBirth, phone, email } = req.body;
       const result = await query(
-        'UPDATE students SET first_name=$1, last_name=$2, date_of_birth=$3, contact_number=$4, email=$5 WHERE id=$6 RETURNING *',
-        [firstName, lastName, dateOfBirth || null, contactNumber || null, email || null, id]
+        'UPDATE students SET first_name=$1, last_name=$2, date_of_birth=$3, phone=$4, email=$5 WHERE id=$6 RETURNING *',
+        [firstName, lastName, dateOfBirth || null, phone || null, email || null, id]
       );
       res.json({ success: true, data: result.rows[0] });
     } catch (error: any) {

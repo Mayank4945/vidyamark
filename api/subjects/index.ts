@@ -23,14 +23,14 @@ export default async (req: VercelRequest, res: VercelResponse) => {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const { code, name, maxMarks } = req.body;
+      const { code, name, description } = req.body;
       if (!code || !name) {
         return res.status(400).json({ error: 'code and name are required' });
       }
 
       const result = await query(
-        'INSERT INTO subjects (code, name, max_marks) VALUES ($1, $2, $3) RETURNING *',
-        [code, name, maxMarks || 100]
+        'INSERT INTO subjects (code, name, description) VALUES ($1, $2, $3) RETURNING *',
+        [code, name, description || null]
       );
       res.status(201).json({ success: true, data: result.rows[0] });
     } catch (error: any) {
