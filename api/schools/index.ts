@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { query } from '../../_lib/db';
-import { extractToken, verifyToken } from '../../_lib/auth';
+import { query } from '../_lib/db';
+import { extractToken, verifyToken } from '../_lib/auth';
 
 export default async (req: VercelRequest, res: VercelResponse) => {
   const token = extractToken(req.headers.authorization);
