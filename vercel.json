@@ -1,12 +1,6 @@
 {
   "version": 2,
   "buildCommand": "cd frontend && npm install && npm run build",
-  "env": {
-    "DATABASE_URL": "@database_url",
-    "DB_SSL": "@db_ssl",
-    "JWT_SECRET": "@jwt_secret",
-    "CORS_ORIGIN": "@cors_origin"
-  },
   "functions": {
     "api/**/*.ts": {
       "runtime": "nodejs20.x",
