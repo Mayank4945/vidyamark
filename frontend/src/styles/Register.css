@@ -1,0 +1,35 @@
+.register-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.register-card {
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.register-header {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.register-header h1 {
+  font-size: 28px;
+  margin: 0;
+  color: #1890ff;
+}
+
+.register-header p {
+  margin: 8px 0 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.register-footer p {
+  margin: 8px 0;
+  color: #666;
+}
