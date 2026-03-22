@@ -12,6 +12,7 @@ import StudentManagement from './pages/StudentManagement';
 import ExamManagement from './pages/ExamManagement';
 import MarkEntry from './pages/MarkEntry';
 import Reports from './pages/Reports';
+import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import UserManagement from './pages/UserManagement';
 import UserRequests from './pages/UserRequests';
@@ -85,6 +86,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <Reports />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/analytics/:classId"
+              element={
+                <PrivateRoute>
+                  <Analytics />
                 </PrivateRoute>
               }
             />

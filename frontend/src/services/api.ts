@@ -249,6 +249,25 @@ class APIClient {
       data: { id: userId }
     });
   }
+
+  // Analytics endpoints
+  getClassPerformance(classId?: number) {
+    let url = '/analytics?type=class-performance';
+    if (classId) url += `&classId=${classId}`;
+    return this.client.get(url);
+  }
+
+  getStudentRanking(classId: number) {
+    return this.client.get(`/analytics?type=student-ranking&classId=${classId}`);
+  }
+
+  getSubjectWisePerformance(classId: number) {
+    return this.client.get(`/analytics?type=subject-wise&classId=${classId}`);
+  }
+
+  getPerformanceTrend(classId: number) {
+    return this.client.get(`/analytics?type=performance-trend&classId=${classId}`);
+  }
 }
 
 export default new APIClient();
