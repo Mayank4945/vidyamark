@@ -133,11 +133,11 @@ export default function Analytics() {
         ]);
 
         setData({
-          classPerformance: performance.data || [],
-          studentRanking: ranking.data || [],
-          subjectWisePerformance: subject.data || [],
-          performanceTrend: trend.data || [],
-          studentGrades: grades.data || [],
+          classPerformance: performance.data?.data || [],
+          studentRanking: ranking.data?.data || [],
+          subjectWisePerformance: subject.data?.data || [],
+          performanceTrend: trend.data?.data || [],
+          studentGrades: grades.data?.data || [],
         });
       } catch (err: any) {
         setError(err.response?.data?.error || 'Failed to load analytics data');
@@ -162,7 +162,7 @@ export default function Analytics() {
       
       // Refresh grades
       const gradesResponse = await api.getCalculatedGrades(numClassId, selectedAcademicYear);
-      setData(prev => ({ ...prev, studentGrades: gradesResponse.data || [] }));
+      setData(prev => ({ ...prev, studentGrades: gradesResponse.data?.data || [] }));
       
       setRecalculateModalVisible(false);
       Modal.success({
