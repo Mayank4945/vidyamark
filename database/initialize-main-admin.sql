@@ -1,20 +1,21 @@
 -- Initialize Main Admin Account
--- Run this script after migration-add-user-requests.sql
+-- Email: admin@vidyamark.com
+-- Password: admin123
+-- Bcrypt hash: $2a$10$EIx.OHrQ1SZKvJZu3bZuB.nKKCM6eVLQ6HvC1KCGHoKX.Rq.M9j2K
 
--- First, ensure the main admin account exists
+DELETE FROM users WHERE email = 'admin@vidyamark.com';
+
 INSERT INTO users (email, password, first_name, last_name, role, school_id, status, is_active)
 VALUES (
   'admin@vidyamark.com',
-  '$2a$10$bL77YWj5bqkTqPjMYhYzSuH5S8OqRVjPF/OYgPfKlP1.iDlvvS.gC', -- bcrypt hash of 'admin123'
+  '$2a$10$EIx.OHrQ1SZKvJZu3bZuB.nKKCM6eVLQ6HvC1KCGHoKX.Rq.M9j2K',
   'VidyaMark',
   'Admin',
   'main_admin',
   NULL,
   'active',
   true
-)
-ON CONFLICT (email) DO UPDATE SET
-  updated_at = CURRENT_TIMESTAMP;
+);
 
 -- Verify insertion
-SELECT id, email, role, status FROM users WHERE email = 'admin@vidyamark.com';
+SELECT id, email, role, status, is_active FROM users WHERE email = 'admin@vidyamark.com';

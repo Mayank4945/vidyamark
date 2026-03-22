@@ -85,24 +85,19 @@ const Schools: React.FC = () => {
       key: 'name'
     },
     {
-      title: 'City',
-      dataIndex: 'city',
-      key: 'city'
-    },
-    {
       title: 'Principal',
       dataIndex: 'principal',
       key: 'principal'
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email'
-    },
-    {
       title: 'Phone',
       dataIndex: 'phone',
       key: 'phone'
+    },
+    {
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address'
     },
     {
       title: 'Actions',
@@ -169,28 +164,9 @@ const Schools: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            label="City"
-            name="city"
-            rules={[{ required: true, message: 'Please enter city' }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
             label="Principal Name"
             name="principal"
             rules={[{ required: true, message: 'Please enter principal name' }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[
-              { required: true, message: 'Please enter email' },
-              { type: 'email', message: 'Please enter valid email' }
-            ]}
           >
             <Input />
           </Form.Item>

@@ -11,7 +11,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   // Allow public access for GET (reading schools for registration form)
   if (req.method === 'GET') {
     try {
-      const result = await query('SELECT id, name, city, principal, email, phone FROM schools ORDER BY name');
+      const result = await query('SELECT id, name, principal, phone, address FROM schools ORDER BY name');
       res.json({
         success: true,
         data: result.rows,
@@ -35,20 +35,21 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
   if (req.method === 'POST') {
     try {
-      const { name, address, phone, principal, city, email } = req.body;
+      const { name, address, phone, principal } = req.body;
       const result = await query(
-        'INSERT INTO schools (name, address, phone, principal, city, email) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        [name || null, address || null, phone || null, principal || null, city || null, email || null]
+        'INSERT INTO schools (name, address, phone, principal) VALUES ($1, $2, $3, $4) RETURNING *',
+        [name, address || null, phone || null, principal || null]
       );
       res.status(201).json({ success: true, data: result.rows[0] });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
+  } else if (req.method === 'PUT') {
     try {
-      const { id, name, address, phone, principal, city, email } = req.body;
+      const { id, name, address, phone, principal } = req.body;
       const result = await query(
-        'UPDATE schools SET name=$1, address=$2, phone=$3, principal=$4, city=$5, email=$6 WHERE id=$7 RETURNING *',
-        [name || null, address || null, phone || null, principal || null, city || null, email || null, id]
+        'UPDATE schools SET name=$1, address=$2, phone=$3, principal=$4 WHERE id=$5 RETURNING *',
+        [name, address || null, phone || null, principal || null, id]
       );
       res.json({ success: true, data: result.rows[0] });
     } catch (error: any) {
