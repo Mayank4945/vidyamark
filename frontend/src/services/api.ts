@@ -269,51 +269,51 @@ class APIClient {
     return this.client.get(`/analytics?type=performance-trend&classId=${classId}`);
   }
 
-  // Academic Years endpoints
+  // Academic Years endpoints (consolidated into /grading)
   getAcademicYears(includeInactive?: boolean) {
-    let url = '/academic-years';
-    if (includeInactive) url += '?includeInactive=true';
+    let url = '/grading?resource=academic-years';
+    if (includeInactive) url += '&includeInactive=true';
     return this.client.get(url);
   }
 
   createAcademicYear(data: any) {
-    return this.client.post('/academic-years', data);
+    return this.client.post('/grading?resource=academic-years', data);
   }
 
   updateAcademicYear(id: number, data: any) {
-    return this.client.put('/academic-years', { id, ...data });
+    return this.client.put('/grading?resource=academic-years', { id, ...data });
   }
 
   deleteAcademicYear(id: number) {
-    return this.client.delete('/academic-years', { data: { id } });
+    return this.client.delete('/grading?resource=academic-years', { data: { id } });
   }
 
-  // Grading Policies endpoints
+  // Grading Policies endpoints (consolidated into /grading)
   getGradingPolicies(academicYearId?: number) {
-    let url = '/grading-policies';
-    if (academicYearId) url += `?academicYearId=${academicYearId}`;
+    let url = '/grading?resource=grading-policies';
+    if (academicYearId) url += `&academicYearId=${academicYearId}`;
     return this.client.get(url);
   }
 
   createGradingPolicy(data: any) {
-    return this.client.post('/grading-policies', data);
+    return this.client.post('/grading?resource=grading-policies', data);
   }
 
   updateGradingPolicy(data: any) {
-    return this.client.put('/grading-policies', data);
+    return this.client.put('/grading?resource=grading-policies', data);
   }
 
   deleteGradingPolicy(id: number) {
-    return this.client.delete('/grading-policies', { data: { id } });
+    return this.client.delete('/grading?resource=grading-policies', { data: { id } });
   }
 
-  // Calculate Grades endpoints
+  // Calculate Grades endpoints (consolidated into /grading)
   calculateGrades(classId: number, academicYearId: number) {
-    return this.client.post('/calculate-grades', { class_id: classId, academic_year_id: academicYearId });
+    return this.client.post('/grading?resource=grades', { class_id: classId, academic_year_id: academicYearId });
   }
 
   getCalculatedGrades(classId: number, academicYearId: number) {
-    return this.client.get(`/calculate-grades?classId=${classId}&academicYearId=${academicYearId}`);
+    return this.client.get(`/grading?resource=grades&classId=${classId}&academicYearId=${academicYearId}`);
   }
 }
 
