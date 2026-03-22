@@ -92,9 +92,9 @@ const NavigationLayout: React.FC = () => {
       onClick: () => navigate('/marks')
     },
     {
-      key: '/users',
+      key: '/user-management',
       label: '👨‍🏫 Teachers',
-      onClick: () => navigate('/users')
+      onClick: () => navigate('/user-management')
     },
     {
       key: '/user-requests',
