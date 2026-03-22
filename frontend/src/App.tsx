@@ -7,6 +7,7 @@ import './App.css';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import MainAdminDashboard from './pages/MainAdminDashboard';
 import StudentManagement from './pages/StudentManagement';
 import ExamManagement from './pages/ExamManagement';
 import MarkEntry from './pages/MarkEntry';
@@ -15,6 +16,7 @@ import Settings from './pages/Settings';
 import UserManagement from './pages/UserManagement';
 import UserRequests from './pages/UserRequests';
 import Schools from './pages/Schools';
+import AddSchoolAdmin from './pages/AddSchoolAdmin';
 
 // Components
 import NavigationLayout from './components/NavigationLayout';
@@ -115,6 +117,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <Schools />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/add-school-admin/:schoolId"
+              element={
+                <PrivateRoute>
+                  <AddSchoolAdmin />
                 </PrivateRoute>
               }
             />

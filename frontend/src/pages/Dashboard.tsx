@@ -18,6 +18,7 @@ import {
   PlusOutlined
 } from '@ant-design/icons';
 import api from '../services/api';
+import MainAdminDashboard from './MainAdminDashboard';
 
 const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -28,6 +29,14 @@ const Dashboard: React.FC = () => {
     totalStudents: 0,
     totalClasses: 0
   });
+
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isMainAdmin = user.role === 'main_admin';
+
+  // If main admin, show the admin dashboard
+  if (isMainAdmin) {
+    return <MainAdminDashboard />;
+  }
 
   useEffect(() => {
     fetchClasses();
