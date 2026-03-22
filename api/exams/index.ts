@@ -38,10 +38,20 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     }
   } else if (req.method === 'POST') {
     try {
-      const { schoolId, classId, name, date, totalMarks, description } = req.body;
+      const token = extractToken(req.headers.authorization);
+      if (!token || !verifyToken(token)) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const { classId, subjectId, examType, examName, examDate, maxMarks, passingMarks, description } = req.body;
+      
+      if (!classId || !subjectId || !examType || !examName || !examDate) {
+        return res.status(400).json({ error: 'classId, subjectId, examType, examName, and examDate are required' });
+      }
+
       const result = await query(
-        'INSERT INTO exams (school_id, class_id, name, date, total_marks, description) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        [schoolId, classId, name, date || null, totalMarks || 100, description || null]
+        'INSERT INTO exams (class_id, subject_id, exam_type, exam_name, exam_date, max_marks, passing_marks, description, created_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+        [classId, subjectId, examType, examName, examDate, maxMarks || 100, passingMarks || 40, description || null, 1]
       );
       res.status(201).json({ success: true, data: result.rows[0] });
     } catch (error: any) {
@@ -49,10 +59,15 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     }
   } else if (req.method === 'PUT') {
     try {
-      const { id, name, date, totalMarks, description } = req.body;
+      const token = extractToken(req.headers.authorization);
+      if (!token || !verifyToken(token)) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const { id, examName, examDate, maxMarks, passingMarks, description } = req.body;
       const result = await query(
-        'UPDATE exams SET name=$1, date=$2, total_marks=$3, description=$4 WHERE id=$5 RETURNING *',
-        [name, date || null, totalMarks || 100, description || null, id]
+        'UPDATE exams SET exam_name=$1, exam_date=$2, max_marks=$3, passing_marks=$4, description=$5 WHERE id=$6 RETURNING *',
+        [examName, examDate, maxMarks || 100, passingMarks || 40, description || null, id]
       );
       res.json({ success: true, data: result.rows[0] });
     } catch (error: any) {
