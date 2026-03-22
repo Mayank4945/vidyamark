@@ -14,7 +14,7 @@ import {
   Input,
   InputNumber
 } from 'antd';
-import { PlusOutlined, FileExcelOutlined, ImportOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, FileExcelOutlined, ImportOutlined } from '@ant-design/icons';
 import StudentTable from '../components/StudentTable';
 import StudentForm from '../components/StudentForm';
 import api from '../services/api';
@@ -27,14 +27,15 @@ const StudentManagement: React.FC = () => {
   const [formVisible, setFormVisible] = useState(false);
   const [editingStudent, setEditingStudent] = useState<any>(null);
   const [formLoading, setFormLoading] = useState(false);
-  const [setupModalVisible, setSetupModalVisible] = useState(false);
-  const [setupForm] = Form.useForm();
-  const [setupLoading, setSetupLoading] = useState(false);
+  const [createClassModalVisible, setCreateClassModalVisible] = useState(false);
+  const [createClassForm] = Form.useForm();
+  const [createClassLoading, setCreateClassLoading] = useState(false);
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
     fetchClasses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -192,80 +193,27 @@ const StudentManagement: React.FC = () => {
     }
   };
 
-  const handleDeleteSchool = async (schoolId: number, schoolName: string) => {
-    Modal.confirm({
-      title: 'Delete School',
-      content: `Are you sure you want to delete "${schoolName}"? This will also delete all related classes and students.`,
-      okText: 'Delete',
-      okType: 'danger',
-      cancelText: 'Cancel',
-      onOk: async () => {
-        try {
-          setLoading(true);
-          await api.deleteSchool(schoolId);
-          message.success('School deleted successfully');
-          
-          // Refresh schools
-          await fetchSchools();
-          
-          // If deleted school was selected, select first available school
-          if (selectedSchool === schoolId) {
-            const remaining = schools.filter(s => s.id !== schoolId);
-            if (remaining.length > 0) {
-              setSelectedSchool(remaining[0].id);
-            } else {
-              setSelectedSchool(null);
-              setClasses([]);
-            }
-          }
-        } catch (error: any) {
-          message.error('Failed to delete school');
-        } finally {
-          setLoading(false);
-        }
-      }
-    });
-  };
-
-  const handleSetupSchoolAndClass = async (values: any) => {
+  const handleCreateClass = async (values: any) => {
     try {
-      setSetupLoading(true);
+      setCreateClassLoading(true);
       
-      let schoolId = selectedSchool;
-      
-      // Only create school if schoolName is provided
-      if (values.schoolName) {
-        const schoolRes = await api.createSchool({
-          name: values.schoolName,
-          address: 'To be updated',
-          phone: values.schoolPhone || ''
-        });
-        schoolId = schoolRes.data.data?.id;
-        await fetchSchools();
-      }
-
-      if (!schoolId) {
-        message.error('Please select a school or provide a new school name');
-        return;
-      }
-
-      // Create class (don't include schoolId as it's determined by JWT token)
-      const classRes = await api.createClass({
+      // Create class (schoolId is determined by JWT token)
+      await api.createClass({
         name: values.className,
         gradeLevel: values.gradeLevel
       });
       
       message.success('Class created successfully!');
-      setSetupModalVisible(false);
-      setupForm.resetFields();
+      setCreateClassModalVisible(false);
+      createClassForm.resetFields();
       
       // Refresh classes
-      setSelectedSchool(schoolId);
+      await fetchClasses();
     } catch (error: any) {
       const errorMsg = error.response?.data?.message || 'Failed to create class';
       message.error(errorMsg);
     } finally {
-      setSetupLoading(false);
+      setCreateClassLoading(false);
     }
   };
 
@@ -294,49 +242,6 @@ const StudentManagement: React.FC = () => {
         <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
           <Col xs={24} sm={12} md={8}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-              Select School {schools.length > 1 && <span style={{ color: '#ff4d4f', fontSize: '12px' }}>({schools.length} total)</span>}
-            </label>
-            {schools.length === 0 ? (
-              <div style={{ padding: '12px', backgroundColor: '#fff7e6', borderRadius: '4px' }}>
-                <p style={{ margin: '0', color: '#d46b08', fontSize: '12px' }}>
-                  No schools found. Create one using the add class button.
-                </p>
-              </div>
-            ) : (
-              <div style={{ border: '1px solid #d9d9d9', borderRadius: '4px', maxHeight: '200px', overflowY: 'auto' }}>
-                {schools.map(school => (
-                  <div
-                    key={school.id}
-                    style={{
-                      padding: '8px 12px',
-                      borderBottom: '1px solid #f0f0f0',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      backgroundColor: selectedSchool === school.id ? '#e6f7ff' : 'white',
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => setSelectedSchool(school.id)}
-                  >
-                    <span style={{ flex: 1 }}>{school.name}</span>
-                    <Button
-                      type="text"
-                      danger
-                      size="small"
-                      icon={<DeleteOutlined />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteSchool(school.id, school.name);
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </Col>
-          
-          <Col xs={24} sm={12} md={8}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
               Select Class
             </label>
             {classes.length === 0 ? (
@@ -347,7 +252,7 @@ const StudentManagement: React.FC = () => {
                 <Button 
                   type="primary" 
                   size="small"
-                  onClick={() => setSetupModalVisible(true)}
+                  onClick={() => setCreateClassModalVisible(true)}
                 >
                   Create Class
                 </Button>
@@ -400,42 +305,20 @@ const StudentManagement: React.FC = () => {
       />
 
       <Modal
-        title="Add New Class"
-        open={setupModalVisible}
+        title="Create New Class"
+        open={createClassModalVisible}
         onCancel={() => {
-          setSetupModalVisible(false);
-          setupForm.resetFields();
+          setCreateClassModalVisible(false);
+          createClassForm.resetFields();
         }}
         footer={null}
         width={500}
       >
         <Form
-          form={setupForm}
+          form={createClassForm}
           layout="vertical"
-          onFinish={handleSetupSchoolAndClass}
+          onFinish={handleCreateClass}
         >
-          <Form.Item
-            label="School"
-            > 
-            <div style={{ padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-              {selectedSchool && schools.find(s => s.id === selectedSchool)?.name || 'No school selected'}
-            </div>
-          </Form.Item>
-
-          <Form.Item
-            label="Or Create New School (Optional)"
-            name="schoolName"
-          >
-            <Input placeholder="e.g., ABC High School" />
-          </Form.Item>
-
-          <Form.Item
-            label="School Phone (Optional)"
-            name="schoolPhone"
-          >
-            <Input placeholder="+1234567890" />
-          </Form.Item>
-
           <Form.Item
             label="Class Name"
             name="className"
@@ -456,7 +339,7 @@ const StudentManagement: React.FC = () => {
             <Button 
               type="primary" 
               htmlType="submit" 
-              loading={setupLoading}
+              loading={createClassLoading}
               block
             >
               Create Class
