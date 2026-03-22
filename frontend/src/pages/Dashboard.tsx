@@ -12,7 +12,6 @@ import {
   Spin
 } from 'antd';
 import {
-  UserAddOutlined,
   TeamOutlined,
   FilePdfOutlined,
   FileExcelOutlined,
@@ -32,6 +31,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchClasses();
+    autoSeedSubjects();
   }, []);
 
   useEffect(() => {
@@ -43,7 +43,6 @@ const Dashboard: React.FC = () => {
   const fetchClasses = async () => {
     try {
       setLoading(true);
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
       const response = await api.getClasses();
       
       if (response.data.data && response.data.data.length > 0) {
@@ -57,29 +56,48 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleSeedSubjects = async () => {
+  const fetchStudents = async (classId: number) => {
     try {
       setLoading(true);
-      await api.seedSubjects();
-      message.success('Subjects seeded successfully!');
+      const response = await api.getStudents(classId);
+      const rawStudents = response.data.data || [];
+      
+      // Transform snake_case from database to camelCase for frontend
+      const transformedStudents = rawStudents.map((student: any) => ({
+        id: student.id,
+        rollNumber: student.roll_number,
+        firstName: student.first_name,
+        lastName: student.last_name,
+        fullName: `${student.first_name} ${student.last_name}`,
+        email: student.email,
+        phone: student.phone,
+        parentName: student.parent_name,
+        parentContact: student.parent_contact
+      }));
+      
+      setStudents(transformedStudents);
+      setStats(prev => ({
+        ...prev,
+        totalStudents: transformedStudents.length
+      }));
     } catch (error: any) {
-      console.error('Error seeding subjects:', error);
-      message.error('Failed to seed subjects');
+      message.error('Failed to load students');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchStudents = async (classId: number) => {
+  const autoSeedSubjects = async () => {
     try {
-      const response = await api.getStudents(classId);
-      setStudents(response.data.data || []);
-      setStats(prev => ({
-        ...prev,
-        totalStudents: response.data.count || 0
-      }));
+      // Automatically seed subjects on first app load if they don't exist
+      const subjectsResponse = await api.getSubjects();
+      if (!subjectsResponse.data.data || subjectsResponse.data.data.length === 0) {
+        console.log('No subjects found, seeding default subjects...');
+        await api.seedSubjects();
+        console.log('Subjects seeded successfully');
+      }
     } catch (error: any) {
-      message.error('Failed to load students');
+      console.log('Subjects already exist or error:', error.message);
     }
   };
 
@@ -137,9 +155,6 @@ const Dashboard: React.FC = () => {
           <Space>
             <Button type="primary" icon={<PlusOutlined />}>
               Add Student
-            </Button>
-            <Button onClick={handleSeedSubjects} loading={loading}>
-              🌱 Seed Subjects
             </Button>
             <Button icon={<FileExcelOutlined />}>
               Export Excel
