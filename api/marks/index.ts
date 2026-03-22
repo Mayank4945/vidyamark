@@ -17,7 +17,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     try {
       const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : null;
       const examId = req.query.examId ? parseInt(req.query.examId as string) : null;
-      let sql = 'SELECT m.* FROM marks m INNER JOIN exams e ON m.exam_id = e.id INNER JOIN classes c ON e.class_id = c.id WHERE c.school_id = $1';
+      let sql = 'SELECT m.* FROM marks m INNER JOIN exams e ON m.exam_id = e.id LEFT JOIN classes c ON e.class_id = c.id WHERE (e.school_id = $1 OR c.school_id = $1)';
       const params: any[] = [userSchoolId];
 
       if (studentId) {
@@ -44,7 +44,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       const { studentId, examId, marksObtained, isAbsent } = req.body;
 
       // Verify exam belongs to user's school
-      const examCheck = await query('SELECT e.* FROM exams e INNER JOIN classes c ON e.class_id = c.id WHERE e.id = $1 AND c.school_id = $2', [examId, userSchoolId]);
+      const examCheck = await query('SELECT e.* FROM exams e LEFT JOIN classes c ON e.class_id = c.id WHERE e.id = $1 AND (e.school_id = $2 OR c.school_id = $2)', [examId, userSchoolId]);
       if (examCheck.rows.length === 0) {
         return res.status(403).json({ error: 'Forbidden: Exam not found in your school' });
       }
@@ -68,7 +68,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       const { id, marksObtained, isAbsent } = req.body;
 
       // Verify mark belongs to user's school
-      const markCheck = await query('SELECT m.* FROM marks m INNER JOIN exams e ON m.exam_id = e.id INNER JOIN classes c ON e.class_id = c.id WHERE m.id = $1 AND c.school_id = $2', [id, userSchoolId]);
+      const markCheck = await query('SELECT m.* FROM marks m INNER JOIN exams e ON m.exam_id = e.id LEFT JOIN classes c ON e.class_id = c.id WHERE m.id = $1 AND (e.school_id = $2 OR c.school_id = $2)', [id, userSchoolId]);
       if (markCheck.rows.length === 0) {
         return res.status(403).json({ error: 'Forbidden: Mark not found in your school' });
       }
@@ -86,12 +86,13 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       const { id } = req.body;
 
       // Verify mark belongs to user's school
-      const markCheck = await query('SELECT m.* FROM marks m INNER JOIN exams e ON m.exam_id = e.id INNER JOIN classes c ON e.class_id = c.id WHERE m.id = $1 AND c.school_id = $2', [id, userSchoolId]);
+      const markCheck = await query('SELECT m.* FROM marks m INNER JOIN exams e ON m.exam_id = e.id LEFT JOIN classes c ON e.class_id = c.id WHERE m.id = $1 AND (e.school_id = $2 OR c.school_id = $2)', [id, userSchoolId]);
       if (markCheck.rows.length === 0) {
         return res.status(403).json({ error: 'Forbidden: Mark not found in your school' });
       }
 
       await query('DELETE FROM marks WHERE id = $1', [id]);
+
       res.json({ success: true, message: 'Mark deleted' });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
