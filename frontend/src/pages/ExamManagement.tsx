@@ -93,8 +93,13 @@ const ExamManagement: React.FC = () => {
   const handleEditExam = (exam: any) => {
     setEditingExam(exam);
     form.setFieldsValue({
-      ...exam,
-      examDate: dayjs(exam.exam_date)
+      examName: exam.exam_name,
+      subjectId: exam.subject_id,
+      examType: exam.exam_type,
+      examDate: dayjs(exam.exam_date),
+      maxMarks: exam.max_marks,
+      passingMarks: exam.passing_marks,
+      description: exam.description
     });
     setFormVisible(true);
   };
@@ -262,7 +267,7 @@ const ExamManagement: React.FC = () => {
         >
           <Form.Item
             label="Exam Name"
-            name="exam_name"
+            name="examName"
             rules={[{ required: true, message: 'Please enter exam name' }]}
           >
             <Input placeholder="e.g., Midterm 2024" />
@@ -270,7 +275,7 @@ const ExamManagement: React.FC = () => {
 
           <Form.Item
             label="Subject"
-            name="subject_id"
+            name="subjectId"
             rules={[{ required: true, message: 'Please select subject' }]}
           >
             <Select placeholder="Select subject">
@@ -284,7 +289,7 @@ const ExamManagement: React.FC = () => {
 
           <Form.Item
             label="Exam Type"
-            name="exam_type"
+            name="examType"
             rules={[{ required: true, message: 'Please select exam type' }]}
           >
             <Select placeholder="Select exam type">
@@ -308,7 +313,7 @@ const ExamManagement: React.FC = () => {
             <Col span={12}>
               <Form.Item
                 label="Max Marks"
-                name="max_marks"
+                name="maxMarks"
                 initialValue={100}
                 rules={[{ required: true, message: 'Please enter max marks' }]}
               >
@@ -318,7 +323,7 @@ const ExamManagement: React.FC = () => {
             <Col span={12}>
               <Form.Item
                 label="Passing Marks"
-                name="passing_marks"
+                name="passingMarks"
                 initialValue={40}
                 rules={[{ required: true, message: 'Please enter passing marks' }]}
               >
