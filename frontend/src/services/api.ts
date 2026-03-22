@@ -268,6 +268,53 @@ class APIClient {
   getPerformanceTrend(classId: number) {
     return this.client.get(`/analytics?type=performance-trend&classId=${classId}`);
   }
+
+  // Academic Years endpoints
+  getAcademicYears(includeInactive?: boolean) {
+    let url = '/academic-years';
+    if (includeInactive) url += '?includeInactive=true';
+    return this.client.get(url);
+  }
+
+  createAcademicYear(data: any) {
+    return this.client.post('/academic-years', data);
+  }
+
+  updateAcademicYear(id: number, data: any) {
+    return this.client.put('/academic-years', { id, ...data });
+  }
+
+  deleteAcademicYear(id: number) {
+    return this.client.delete('/academic-years', { data: { id } });
+  }
+
+  // Grading Policies endpoints
+  getGradingPolicies(academicYearId?: number) {
+    let url = '/grading-policies';
+    if (academicYearId) url += `?academicYearId=${academicYearId}`;
+    return this.client.get(url);
+  }
+
+  createGradingPolicy(data: any) {
+    return this.client.post('/grading-policies', data);
+  }
+
+  updateGradingPolicy(data: any) {
+    return this.client.put('/grading-policies', data);
+  }
+
+  deleteGradingPolicy(id: number) {
+    return this.client.delete('/grading-policies', { data: { id } });
+  }
+
+  // Calculate Grades endpoints
+  calculateGrades(classId: number, academicYearId: number) {
+    return this.client.post('/calculate-grades', { class_id: classId, academic_year_id: academicYearId });
+  }
+
+  getCalculatedGrades(classId: number, academicYearId: number) {
+    return this.client.get(`/calculate-grades?classId=${classId}&academicYearId=${academicYearId}`);
+  }
 }
 
 export default new APIClient();
