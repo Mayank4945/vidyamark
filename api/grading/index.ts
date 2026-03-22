@@ -296,14 +296,17 @@ async function handleGradingPoliciesGET(req: VercelRequest, res: VercelResponse,
         gp.is_active,
         gp.created_at,
         gp.updated_at,
-        json_agg(
-          json_build_object(
-            'id', etw.id,
-            'exam_type', etw.exam_type,
-            'display_name', etw.display_name,
-            'weight_percentage', etw.weight_percentage,
-            'sequence_order', etw.sequence_order
-          ) ORDER BY etw.sequence_order
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', etw.id,
+              'exam_type', etw.exam_type,
+              'display_name', etw.display_name,
+              'weight_percentage', etw.weight_percentage,
+              'sequence_order', etw.sequence_order
+            ) ORDER BY etw.sequence_order
+          ) FILTER (WHERE etw.id IS NOT NULL),
+          '[]'::json
         ) as weightages
       FROM grading_policies gp
       LEFT JOIN academic_years ay ON gp.academic_year_id = ay.id
