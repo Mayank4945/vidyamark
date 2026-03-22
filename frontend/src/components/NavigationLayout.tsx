@@ -17,10 +17,11 @@ const NavigationLayout: React.FC = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
-    if (user.schoolId) {
+    // Only fetch school if user is not main_admin and has schoolId
+    if (user.schoolId && user.role !== 'main_admin') {
       fetchSchool();
     }
-  }, [user.schoolId]);
+  }, [user.schoolId, user.role]);
 
   const fetchSchool = async () => {
     try {
@@ -33,6 +34,84 @@ const NavigationLayout: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Main Admin menu items
+  const mainAdminMenuItems: MenuProps['items'] = [
+    {
+      key: '/dashboard',
+      label: '📊 Dashboard',
+      onClick: () => navigate('/dashboard')
+    },
+    {
+      key: '/schools',
+      label: '🏫 Schools',
+      onClick: () => navigate('/schools')
+    },
+    {
+      key: '/users',
+      label: '👥 User Management',
+      onClick: () => navigate('/users')
+    },
+    {
+      key: '/user-requests',
+      label: '📋 Registration Requests',
+      onClick: () => navigate('/user-requests')
+    },
+    {
+      key: '/reports',
+      label: '📈 Reports',
+      onClick: () => navigate('/reports')
+    },
+    {
+      key: '/settings',
+      label: '⚙️ Settings',
+      onClick: () => navigate('/settings')
+    }
+  ];
+
+  // School Admin menu items
+  const schoolAdminMenuItems: MenuProps['items'] = [
+    {
+      key: '/dashboard',
+      label: '📊 Dashboard',
+      onClick: () => navigate('/dashboard')
+    },
+    {
+      key: '/students',
+      label: '👥 Students',
+      onClick: () => navigate('/students')
+    },
+    {
+      key: '/exams',
+      label: '📝 Exams',
+      onClick: () => navigate('/exams')
+    },
+    {
+      key: '/marks',
+      label: '✏️ Marks',
+      onClick: () => navigate('/marks')
+    },
+    {
+      key: '/users',
+      label: '👨‍🏫 Teachers',
+      onClick: () => navigate('/users')
+    },
+    {
+      key: '/user-requests',
+      label: '📋 Pending Requests',
+      onClick: () => navigate('/user-requests')
+    },
+    {
+      key: '/reports',
+      label: '📈 Reports',
+      onClick: () => navigate('/reports')
+    },
+    {
+      key: '/settings',
+      label: '⚙️ Settings',
+      onClick: () => navigate('/settings')
+    }
+  ];
 
   // Admin menu items
   const adminMenuItems: MenuProps['items'] = [
@@ -92,7 +171,14 @@ const NavigationLayout: React.FC = () => {
     }
   ];
 
-  const menuItems = user.role === 'school_admin' ? adminMenuItems : teacherMenuItems;
+  const menuItems =
+    user.role === 'main_admin'
+      ? mainAdminMenuItems
+      : user.role === 'school_admin'
+      ? schoolAdminMenuItems
+      : user.role === 'admin'
+      ? adminMenuItems
+      : teacherMenuItems;
 
   const userMenuItems: MenuProps['items'] = [
     {
@@ -140,7 +226,8 @@ const NavigationLayout: React.FC = () => {
           }}
         >
           {!collapsed && <div style={{ marginBottom: '8px' }}>🎓 VidyaMark</div>}
-          {!collapsed && school && <div style={{ fontSize: '13px', opacity: 0.8 }}>{school.name}</div>}
+          {!collapsed && user.role === 'main_admin' && <div style={{ fontSize: '13px', opacity: 0.8 }}>Main Admin</div>}
+          {!collapsed && user.role !== 'main_admin' && school && <div style={{ fontSize: '13px', opacity: 0.8 }}>{school.name}</div>}
         </div>
         <Menu
           theme="dark"
@@ -173,6 +260,15 @@ const NavigationLayout: React.FC = () => {
           <Space size="large">
             {loading ? (
               <Spin size="small" />
+            ) : user.role === 'main_admin' ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '12px', color: '#666' }}>Main Admin</div>
+                  <div style={{ fontSize: '13px', fontWeight: '500', color: '#001529' }}>
+                    VidyaMark Platform
+                  </div>
+                </div>
+              </div>
             ) : (
               school && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

@@ -35,6 +35,16 @@ class APIClient {
     );
   }
 
+  // Generic post method
+  post(endpoint: string, data: any) {
+    return this.client.post(endpoint, data);
+  }
+
+  // Generic get method
+  get(endpoint: string) {
+    return this.client.get(endpoint);
+  }
+
   // Auth endpoints
   login(email: string, password: string) {
     return this.client.post('/auth/login', { email, password });
@@ -198,6 +208,51 @@ class APIClient {
 
   seedDefaultSubjects() {
     return this.client.post(`/subjects/seed`, {});
+  }
+
+  // User Request Endpoints (Registration Requests)
+  getUserRequests() {
+    return this.client.get('/user-requests');
+  }
+
+  approveUserRequest(requestId: number, rejectionReason?: string) {
+    return this.client.post('/user-requests', {
+      requestId,
+      action: 'approve',
+      rejectionReason
+    });
+  }
+
+  rejectUserRequest(requestId: number, rejectionReason: string) {
+    return this.client.post('/user-requests', {
+      requestId,
+      action: 'reject',
+      rejectionReason
+    });
+  }
+
+  // User Management Endpoints
+  getUsers(schoolId?: number, role?: string) {
+    let url = '/users';
+    const params = [];
+    if (schoolId) params.push(`schoolId=${schoolId}`);
+    if (role) params.push(`role=${role}`);
+    if (params.length > 0) url += '?' + params.join('&');
+    return this.client.get(url);
+  }
+
+  createUser(data: any) {
+    return this.client.post('/users', data);
+  }
+
+  updateUser(userId: number, data: any) {
+    return this.client.put(`/users/${userId}`, data);
+  }
+
+  deleteUser(userId: number) {
+    return this.client.delete('/users', {
+      data: { id: userId }
+    });
   }
 }
 
