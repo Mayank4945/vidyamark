@@ -40,8 +40,8 @@ class APIClient {
     return this.client.post('/auth/login', { email, password });
   }
 
-  register(email: string, password: string, firstName: string, lastName: string) {
-    return this.client.post('/auth/register', { email, password, firstName, lastName });
+  register(email: string, password: string, firstName: string, lastName: string, schoolId?: number, role?: string) {
+    return this.client.post('/auth/register', { email, password, firstName, lastName, schoolId, role });
   }
 
   // Student endpoints
@@ -134,8 +134,8 @@ class APIClient {
   }
 
   // Class endpoints
-  getClasses(schoolId: number = 1) {
-    return this.client.get(`/classes?schoolId=${schoolId}`);
+  getClasses() {
+    return this.client.get('/classes');
   }
 
   getClassById(classId: number) {

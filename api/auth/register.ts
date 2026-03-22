@@ -21,16 +21,19 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     // Hash password
     const hashedPassword = await bcryptjs.hash(password, 10);
 
-    // Insert user
+    // Insert user with school_id
+    const { schoolId, role } = req.body;
+    const userRole = role || 'teacher'; // Default role
+    
     const result = await query(
-      `INSERT INTO users (email, password, first_name, last_name, role)
-       VALUES ($1, $2, $3, $4, 'teacher')
-       RETURNING id, email, first_name, last_name, role`,
-      [email, hashedPassword, firstName, lastName]
+      `INSERT INTO users (email, password, first_name, last_name, role, school_id)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, email, first_name, last_name, role, school_id`,
+      [email, hashedPassword, firstName, lastName, userRole, schoolId || null]
     );
 
     const user = result.rows[0];
-    const token = generateToken({ userId: user.id, email: user.email });
+    const token = generateToken({ userId: user.id, email: user.email, schoolId: user.school_id });
 
     res.status(201).json({
       success: true,
@@ -40,7 +43,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
-        role: user.role
+        role: user.role,
+        schoolId: user.school_id
       },
       token
     });

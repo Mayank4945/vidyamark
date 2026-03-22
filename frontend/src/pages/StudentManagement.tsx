@@ -23,8 +23,6 @@ const StudentManagement: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [students, setStudents] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
-  const [schools, setSchools] = useState<any[]>([]);
-  const [selectedSchool, setSelectedSchool] = useState<number | null>(null);
   const [selectedClass, setSelectedClass] = useState<number | null>(null);
   const [formVisible, setFormVisible] = useState(false);
   const [editingStudent, setEditingStudent] = useState<any>(null);
@@ -33,15 +31,11 @@ const StudentManagement: React.FC = () => {
   const [setupForm] = Form.useForm();
   const [setupLoading, setSetupLoading] = useState(false);
 
-  useEffect(() => {
-    fetchSchools();
-  }, []);
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
-    if (selectedSchool) {
-      fetchClasses();
-    }
-  }, [selectedSchool]);
+    fetchClasses();
+  }, []);
 
   useEffect(() => {
     if (selectedClass) {
@@ -49,26 +43,10 @@ const StudentManagement: React.FC = () => {
     }
   }, [selectedClass]);
 
-  const fetchSchools = async () => {
-    try {
-      const response = await api.getSchools();
-      const schoolsData = response.data.data || [];
-      setSchools(schoolsData);
-      
-      if (schoolsData.length > 0) {
-        setSelectedSchool(schoolsData[0].id);
-      }
-    } catch (error: any) {
-      message.error('Failed to load schools');
-    }
-  };
-
   const fetchClasses = async () => {
     try {
       setLoading(true);
-      if (!selectedSchool) return;
-      
-      const response = await api.getClasses(selectedSchool);
+      const response = await api.getClasses();
       const classesData = response.data.data || [];
       setClasses(classesData);
       
@@ -146,16 +124,15 @@ const StudentManagement: React.FC = () => {
     try {
       setFormLoading(true);
       
-      if (!selectedClass || !selectedSchool) {
-        message.error('Please select both school and class');
+      if (!selectedClass) {
+        message.error('Please select a class');
         return;
       }
       
       if (editingStudent) {
         // Update student
         const updateData = {
-          schoolId: selectedSchool,
-          classId: selectedClass,
+          id: editingStudent.id,
           rollNumber: data.rollNumber,
           firstName: data.firstName,
           lastName: data.lastName,
@@ -169,9 +146,8 @@ const StudentManagement: React.FC = () => {
         await api.updateStudent(editingStudent.id, updateData);
         message.success('Student updated successfully');
       } else {
-        // Create student
+        // Create student (don't include schoolId as it's determined by JWT token)
         const createData = {
-          schoolId: selectedSchool,
           classId: selectedClass,
           rollNumber: data.rollNumber,
           firstName: data.firstName,
@@ -273,9 +249,8 @@ const StudentManagement: React.FC = () => {
         return;
       }
 
-      // Create class
+      // Create class (don't include schoolId as it's determined by JWT token)
       const classRes = await api.createClass({
-        schoolId: schoolId,
         name: values.className,
         gradeLevel: values.gradeLevel
       });

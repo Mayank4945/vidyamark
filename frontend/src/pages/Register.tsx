@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Card, message, Row, Col } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Button, Card, message, Row, Col, Select } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -8,7 +8,21 @@ import '../styles/Register.css';
 const Register: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [schools, setSchools] = useState<any[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchSchools();
+  }, []);
+
+  const fetchSchools = async () => {
+    try {
+      const response = await api.getSchools();
+      setSchools(response.data.data || []);
+    } catch (error) {
+      console.error('Failed to fetch schools:', error);
+    }
+  };
 
   const onFinish = async (values: any) => {
     setLoading(true);
@@ -17,7 +31,9 @@ const Register: React.FC = () => {
         values.email,
         values.password,
         values.firstName,
-        values.lastName
+        values.lastName,
+        values.schoolId,
+        values.role
       );
 
       // Save token and user data
@@ -83,6 +99,32 @@ const Register: React.FC = () => {
                   placeholder="teacher@school.com"
                   size="large"
                 />
+              </Form.Item>
+
+              <Form.Item
+                label="School"
+                name="schoolId"
+                rules={[{ required: true, message: 'Please select your school' }]}
+              >
+                <Select placeholder="Select your school" size="large">
+                  {schools.map((school) => (
+                    <Select.Option key={school.id} value={school.id}>
+                      {school.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                label="Role"
+                name="role"
+                initialValue="teacher"
+                rules={[{ required: true, message: 'Please select your role' }]}
+              >
+                <Select placeholder="Select your role" size="large">
+                  <Select.Option value="teacher">Teacher</Select.Option>
+                  <Select.Option value="school_admin">School Admin</Select.Option>
+                </Select>
               </Form.Item>
 
               <Form.Item

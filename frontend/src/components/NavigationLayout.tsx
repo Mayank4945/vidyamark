@@ -1,19 +1,41 @@
-import React, { useState } from 'react';
-import { Layout, Menu, Button, Dropdown, Avatar, Space } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Menu, Button, Dropdown, Avatar, Space, Spin } from 'antd';
 import { LogoutOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import type { MenuProps } from 'antd';
+import api from '../services/api';
 
 const { Header, Sider, Content } = Layout;
 
 const NavigationLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [school, setSchool] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  const menuItems: MenuProps['items'] = [
+  useEffect(() => {
+    if (user.schoolId) {
+      fetchSchool();
+    }
+  }, [user.schoolId]);
+
+  const fetchSchool = async () => {
+    try {
+      setLoading(true);
+      const response = await api.getSchoolById(user.schoolId);
+      setSchool(response.data.data);
+    } catch (error) {
+      console.error('Failed to fetch school:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Admin menu items
+  const adminMenuItems: MenuProps['items'] = [
     {
       key: '/dashboard',
       label: '📊 Dashboard',
@@ -46,6 +68,32 @@ const NavigationLayout: React.FC = () => {
     }
   ];
 
+  // Teacher menu items (only marks entry)
+  const teacherMenuItems: MenuProps['items'] = [
+    {
+      key: '/dashboard',
+      label: '📊 Dashboard',
+      onClick: () => navigate('/dashboard')
+    },
+    {
+      key: '/marks',
+      label: '✏️ Enter Marks',
+      onClick: () => navigate('/marks')
+    },
+    {
+      key: '/reports',
+      label: '📋 Reports',
+      onClick: () => navigate('/reports')
+    },
+    {
+      key: '/settings',
+      label: '⚙️ Settings',
+      onClick: () => navigate('/settings')
+    }
+  ];
+
+  const menuItems = user.role === 'school_admin' ? adminMenuItems : teacherMenuItems;
+
   const userMenuItems: MenuProps['items'] = [
     {
       key: 'profile',
@@ -73,9 +121,9 @@ const NavigationLayout: React.FC = () => {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        width={250}
+        width={280}
         style={{
-          background: '#001529',
+          background: 'linear-gradient(180deg, #001529 0%, #002140 100%)',
           boxShadow: '2px 0 8px rgba(0,0,0,0.15)'
         }}
       >
@@ -84,41 +132,61 @@ const NavigationLayout: React.FC = () => {
             padding: '20px',
             color: 'white',
             textAlign: 'center',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            borderBottom: '1px solid rgba(255,255,255,0.2)'
+            fontSize: '16px',
+            fontWeight: '600',
+            borderBottom: '1px solid rgba(255,255,255,0.2)',
+            whiteSpace: 'normal',
+            wordWrap: 'break-word'
           }}
         >
-          {!collapsed && '🎓 VidyaMark'}
+          {!collapsed && <div style={{ marginBottom: '8px' }}>🎓 VidyaMark</div>}
+          {!collapsed && school && <div style={{ fontSize: '13px', opacity: 0.8 }}>{school.name}</div>}
         </div>
         <Menu
           theme="dark"
           mode="inline"
           selectedKeys={[location.pathname]}
           items={menuItems}
-          style={{ background: '#001529' }}
+          style={{ background: 'transparent', border: 'none' }}
         />
       </Sider>
 
-      <Layout>
+      <Layout style={{ background: '#f0f2f5' }}>
         <Header
           style={{
-            background: '#fff',
-            padding: '0 20px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            background: 'white',
+            padding: '0 24px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
+            borderBottom: '1px solid #f0f0f0'
           }}
         >
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
-            style={{ fontSize: '18px' }}
+            style={{ fontSize: '16px', color: '#001529' }}
           />
 
-          <Space>
+          <Space size="large">
+            {loading ? (
+              <Spin size="small" />
+            ) : (
+              school && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '12px', color: '#666' }}>
+                      {user.role === 'school_admin' ? 'School Admin' : 'Teacher'}
+                    </div>
+                    <div style={{ fontSize: '13px', fontWeight: '500', color: '#001529' }}>
+                      {school.name}
+                    </div>
+                  </div>
+                </div>
+              )
+            )}
             <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
               <Button type="text">
                 <Avatar
@@ -126,8 +194,8 @@ const NavigationLayout: React.FC = () => {
                   style={{ backgroundColor: '#1890ff' }}
                   icon={<UserOutlined />}
                 />
-                <span style={{ marginLeft: '8px' }}>
-                  {user.firstName} {user.lastName}
+                <span style={{ marginLeft: '8px', color: '#001529' }}>
+                  {user.firstName}
                 </span>
               </Button>
             </Dropdown>
@@ -138,10 +206,11 @@ const NavigationLayout: React.FC = () => {
           style={{
             margin: '24px',
             padding: '24px',
-            background: '#f5f5f5',
+            background: 'white',
             borderRadius: '8px',
             minHeight: 'calc(100vh - 112px)',
-            overflow: 'auto'
+            overflow: 'auto',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.06)'
           }}
         >
           <Outlet />

@@ -20,7 +20,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
     // Find user
     const result = await query(
-      `SELECT id, email, password, first_name, last_name, role FROM users WHERE email = $1`,
+      `SELECT id, email, password, first_name, last_name, role, school_id FROM users WHERE email = $1`,
       [email]
     );
 
@@ -43,7 +43,11 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       });
     }
 
-    const token = generateToken({ userId: user.id, email: user.email });
+    const token = generateToken({ 
+      userId: user.id, 
+      email: user.email,
+      schoolId: user.school_id 
+    });
 
     res.json({
       success: true,
@@ -53,7 +57,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
-        role: user.role
+        role: user.role,
+        schoolId: user.school_id
       },
       token
     });
