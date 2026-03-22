@@ -12,6 +12,9 @@ import ExamManagement from './pages/ExamManagement';
 import MarkEntry from './pages/MarkEntry';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import UserManagement from './pages/UserManagement';
+import UserRequests from './pages/UserRequests';
+import Schools from './pages/Schools';
 
 // Components
 import NavigationLayout from './components/NavigationLayout';
@@ -88,6 +91,30 @@ function App() {
               element={
                 <PrivateRoute>
                   <Settings />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/user-management"
+              element={
+                <PrivateRoute>
+                  <UserManagement />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/user-requests"
+              element={
+                <PrivateRoute>
+                  <UserRequests />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/schools"
+              element={
+                <PrivateRoute>
+                  <Schools />
                 </PrivateRoute>
               }
             />

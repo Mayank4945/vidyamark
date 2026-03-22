@@ -98,6 +98,18 @@ const Login: React.FC = () => {
                   Register here
                 </Button>
               </div>
+
+              <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f2f5', borderRadius: '4px' }}>
+                <p style={{ fontSize: '12px', marginBottom: '8px' }}>
+                  <strong>Demo Credentials:</strong>
+                </p>
+                <p style={{ fontSize: '11px', marginBottom: '4px' }}>
+                  <strong>Main Admin:</strong> admin@vidyamark.com / admin123
+                </p>
+                <p style={{ fontSize: '11px' }}>
+                  <strong>For Teachers:</strong> Use registration form to request access
+                </p>
+              </div>
             </Form>
           </Card>
         </Col>
