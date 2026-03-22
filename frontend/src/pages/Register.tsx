@@ -21,14 +21,19 @@ const Register: React.FC = () => {
   const fetchData = async () => {
     try {
       const [schoolsRes, subjectsRes] = await Promise.all([
-        api.getSchools(),
-        api.getSubjects()
+        api.getSchools().catch(() => ({ data: { data: [] } })),
+        api.getSubjects().catch(() => ({ data: { data: [] } }))
       ]);
       setSchools(schoolsRes.data.data || []);
       setSubjects(subjectsRes.data.data || []);
-    } catch (error) {
+      
+      if ((!schoolsRes.data.data || schoolsRes.data.data.length === 0) || 
+          (!subjectsRes.data.data || subjectsRes.data.data.length === 0)) {
+        message.warning('Some data could not be loaded. Please try refreshing the page.');
+      }
+    } catch (error: any) {
       console.error('Failed to fetch data:', error);
-      message.error('Failed to load schools or subjects');
+      message.warning('Please refresh the page to load schools and subjects');
     }
   };
 

@@ -5,6 +5,25 @@ import { extractToken, verifyToken } from '../_lib/auth';
 export default async (req: VercelRequest, res: VercelResponse) => {
   const token = extractToken(req.headers.authorization);
   const decoded = verifyToken(token);
+
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+
+  // Allow public access for GET (reading schools for registration form)
+  if (req.method === 'GET') {
+    try {
+      const result = await query('SELECT id, name, city, principal, email, phone FROM schools ORDER BY name');
+      res.json({
+        success: true,
+        data: result.rows,
+        count: result.rows.length
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+    return;
+  }
+
+  // Require authentication for POST, PUT, DELETE
   if (!token || !decoded) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -14,20 +33,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     return res.status(403).json({ error: 'Forbidden: Only main admin can manage schools' });
   }
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-
-  if (req.method === 'GET') {
-    try {
-      const result = await query('SELECT * FROM schools ORDER BY name');
-      res.json({
-        success: true,
-        data: result.rows,
-        count: result.rows.length
-      });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  } else if (req.method === 'POST') {
+  if (req.method === 'POST') {
     try {
       const { name, address, phone, principal, city, email } = req.body;
       const result = await query(
@@ -38,7 +44,6 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
-  } else if (req.method === 'PUT') {
     try {
       const { id, name, address, phone, principal, city, email } = req.body;
       const result = await query(

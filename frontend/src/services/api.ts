@@ -27,8 +27,12 @@ class APIClient {
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          localStorage.removeItem('authToken');
-          window.location.href = '/login';
+          // Only redirect to login if user is already authenticated
+          const token = localStorage.getItem('authToken');
+          if (token) {
+            localStorage.removeItem('authToken');
+            window.location.href = '/login';
+          }
         }
         return Promise.reject(error);
       }
