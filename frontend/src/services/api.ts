@@ -80,8 +80,11 @@ class APIClient {
   }
 
   // Exam endpoints
-  getExams(classId: number) {
-    return this.client.get(`/exams?classId=${classId}`);
+  getExams(classId?: number) {
+    if (classId) {
+      return this.client.get(`/exams?classId=${classId}`);
+    }
+    return this.client.get('/exams');
   }
 
   getExamById(examId: number) {
@@ -93,11 +96,11 @@ class APIClient {
   }
 
   updateExam(examId: number, data: any) {
-    return this.client.put(`/exams/${examId}`, data);
+    return this.client.put('/exams', { id: examId, ...data });
   }
 
   deleteExam(examId: number) {
-    return this.client.delete(`/exams/${examId}`);
+    return this.client.delete('/exams', { data: { id: examId } });
   }
 
   // Marks endpoints
