@@ -96,7 +96,7 @@ export default function Analytics() {
     const fetchAcademicYears = async () => {
       try {
         const response = await api.getAcademicYears();
-        const years = response.data || [];
+        const years = response.data?.data || [];
         setAcademicYears(years);
 
         // Set selected to active year, or first one
