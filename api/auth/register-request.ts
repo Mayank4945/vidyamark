@@ -8,13 +8,24 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   }
 
   try {
-    const { email, password, firstName, lastName, schoolId, subjectId } = req.body;
+    const { email, password, firstName, lastName, schoolId, subjectId, role } = req.body;
 
     // Validate required fields
-    if (!email || !password || !firstName || !lastName || !schoolId || !subjectId) {
+    if (!email || !password || !firstName || !lastName || !schoolId) {
       return res.status(400).json({
         error: 'Bad Request',
-        message: 'Email, password, firstName, lastName, schoolId, and subjectId are required'
+        message: 'Email, password, firstName, lastName, and schoolId are required'
+      });
+    }
+
+    // Default role to 'teacher' if not specified
+    const userRole = role || 'teacher';
+
+    // Teachers must have a subject
+    if (userRole === 'teacher' && !subjectId) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'subjectId is required for teachers'
       });
     }
 
@@ -51,9 +62,9 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     // Create registration request (pending approval)
     const result = await query(
       `INSERT INTO user_requests (email, password_hash, first_name, last_name, school_id, subject_id, role, status)
-       VALUES ($1, $2, $3, $4, $5, $6, 'teacher', 'pending')
-       RETURNING id, email, first_name, last_name, school_id, subject_id, status, requested_at`,
-      [email, hashedPassword, firstName, lastName, schoolId, subjectId]
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
+       RETURNING id, email, first_name, last_name, school_id, subject_id, role, status, requested_at`,
+      [email, hashedPassword, firstName, lastName, schoolId, subjectId || null, userRole]
     );
 
     const userRequest = result.rows[0];

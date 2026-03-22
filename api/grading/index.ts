@@ -633,11 +633,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   const userSchoolId = decoded.schoolId;
   const userRole = decoded.role;
 
-  console.log('[GRADING API] User attempting access:', { userId: decoded.userId, userRole, userSchoolId });
-
   // Only admins, principals, and school admins can manage grading system
   if (userRole !== 'admin' && userRole !== 'principal' && userRole !== 'school_admin') {
-    console.log('[GRADING API] Access denied - Invalid role:', userRole);
     return res.status(403).json({ error: 'Forbidden: Only admins can manage grading system' });
   }
 
