@@ -57,6 +57,19 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleSeedSubjects = async () => {
+    try {
+      setLoading(true);
+      await api.seedSubjects();
+      message.success('Subjects seeded successfully!');
+    } catch (error: any) {
+      console.error('Error seeding subjects:', error);
+      message.error('Failed to seed subjects');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchStudents = async (classId: number) => {
     try {
       const response = await api.getStudents(classId);
@@ -124,6 +137,9 @@ const Dashboard: React.FC = () => {
           <Space>
             <Button type="primary" icon={<PlusOutlined />}>
               Add Student
+            </Button>
+            <Button onClick={handleSeedSubjects} loading={loading}>
+              🌱 Seed Subjects
             </Button>
             <Button icon={<FileExcelOutlined />}>
               Export Excel

@@ -180,6 +180,10 @@ class APIClient {
     return this.client.get(`/subjects`);
   }
 
+  seedSubjects() {
+    return this.client.post('/subjects/seed', {});
+  }
+
   createSubject(data: any) {
     return this.client.post('/subjects', data);
   }
