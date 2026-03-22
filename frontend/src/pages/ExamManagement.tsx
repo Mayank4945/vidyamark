@@ -51,7 +51,7 @@ const ExamManagement: React.FC = () => {
   const fetchAcademicYears = async () => {
     try {
       const response = await api.getAcademicYears();
-      const years = response.data || [];
+      const years = response.data?.data || [];
       setAcademicYears(years);
       const activeYear = years.find((ay: any) => ay.is_active);
       if (activeYear) {

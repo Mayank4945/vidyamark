@@ -44,7 +44,8 @@ const AcademicYearSettings: React.FC = () => {
     try {
       setLoading(true);
       const response = await api.getAcademicYears(true); // Include inactive
-      setAcademicYears(response.data || []);
+      // The response structure is { success: true, data: [...] }
+      setAcademicYears(response.data?.data || []);
     } catch (error) {
       message.error('Failed to load academic years');
     } finally {

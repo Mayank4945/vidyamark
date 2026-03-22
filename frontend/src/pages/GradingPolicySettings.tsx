@@ -72,7 +72,7 @@ const GradingPolicySettings: React.FC = () => {
   const fetchAcademicYears = async () => {
     try {
       const response = await api.getAcademicYears(true);
-      const years = response.data || [];
+      const years = response.data?.data || [];
       setAcademicYears(years);
       if (years.length > 0) {
         setSelectedAcademicYear(years[0].id);
@@ -86,7 +86,7 @@ const GradingPolicySettings: React.FC = () => {
     try {
       setLoading(true);
       const response = await api.getGradingPolicies(academicYearId);
-      setGradingPolicies(response.data || []);
+      setGradingPolicies(response.data?.data || []);
     } catch (error) {
       message.error('Failed to load grading policies');
     } finally {
