@@ -58,6 +58,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     const token = generateToken({ 
       userId: user.id, 
       email: user.email,
+      role: user.role,
       schoolId: user.school_id 
     });
 
