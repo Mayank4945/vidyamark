@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   Button,
@@ -17,15 +18,20 @@ import {
   InputNumber,
   Tag
 } from 'antd';
-import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, EditOutlined, BarChartOutlined } from '@ant-design/icons';
 import api from '../services/api';
 import dayjs from 'dayjs';
 
 const ExamManagement: React.FC = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [exams, setExams] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
+  const [classes, setClasses] = useState<any[]>([]);
   const [formVisible, setFormVisible] = useState(false);
+  const [analyzeModalVisible, setAnalyzeModalVisible] = useState(false);
+  const [selectedAnalyzeExam, setSelectedAnalyzeExam] = useState<any>(null);
+  const [selectedClassForAnalytics, setSelectedClassForAnalytics] = useState<number | null>(null);
   const [form] = Form.useForm();
   const [editingExam, setEditingExam] = useState<any>(null);
   const [filterSubject, setFilterSubject] = useState<number | null>(null);
@@ -36,7 +42,17 @@ const ExamManagement: React.FC = () => {
   useEffect(() => {
     fetchExams();
     fetchSubjects();
+    fetchClasses();
   }, []);
+
+  const fetchClasses = async () => {
+    try {
+      const response = await api.getClasses();
+      setClasses(response.data?.data || response.data || []);
+    } catch (error) {
+      message.error('Failed to load classes');
+    }
+  };
 
   const fetchExams = async () => {
     try {
@@ -125,6 +141,23 @@ const ExamManagement: React.FC = () => {
     });
   };
 
+  const handleViewAnalytics = (exam: any) => {
+    setSelectedAnalyzeExam(exam);
+    setSelectedClassForAnalytics(null);
+    setAnalyzeModalVisible(true);
+  };
+
+  const handleAnalyticsConfirm = () => {
+    if (!selectedClassForAnalytics) {
+      message.error('Please select a class');
+      return;
+    }
+    setAnalyzeModalVisible(false);
+    navigate(`/analytics/${selectedClassForAnalytics}`, { 
+      state: { examId: selectedAnalyzeExam?.id } 
+    });
+  };
+
   // Filter exams based on selected filters
   const filteredExams = exams.filter((exam: any) => {
     const subjectMatch = !filterSubject || exam.subject_id === filterSubject;
@@ -173,9 +206,17 @@ const ExamManagement: React.FC = () => {
     {
       title: 'Actions',
       key: 'actions',
-      width: '150px',
+      width: '200px',
       render: (_: any, record: any) => (
         <Space size="small">
+          <Button
+            icon={<BarChartOutlined />}
+            size="small"
+            type="primary"
+            onClick={() => handleViewAnalytics(record)}
+          >
+            Analytics
+          </Button>
           <Button
             icon={<EditOutlined />}
             size="small"
@@ -251,6 +292,28 @@ const ExamManagement: React.FC = () => {
           )}
         </Spin>
       </Card>
+
+      <Modal
+        title="Select Class for Analytics"
+        open={analyzeModalVisible}
+        onCancel={() => setAnalyzeModalVisible(false)}
+        onOk={handleAnalyticsConfirm}
+        okText="View Analytics"
+      >
+        <p style={{ marginBottom: '16px' }}>
+          Select a class to view analytics for <strong>{selectedAnalyzeExam?.exam_name}</strong>
+        </p>
+        <Select
+          placeholder="Select Class"
+          value={selectedClassForAnalytics}
+          onChange={setSelectedClassForAnalytics}
+          style={{ width: '100%' }}
+          options={classes.map((cls: any) => ({
+            label: cls.name || `Class ${cls.id}`,
+            value: cls.id
+          }))}
+        />
+      </Modal>
 
       <Modal
         title={editingExam ? 'Edit Exam' : 'Create New Exam'}
