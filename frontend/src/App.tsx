@@ -18,6 +18,8 @@ import UserManagement from './pages/UserManagement';
 import UserRequests from './pages/UserRequests';
 import Schools from './pages/Schools';
 import AddSchoolAdmin from './pages/AddSchoolAdmin';
+import AcademicYearSettings from './pages/AcademicYearSettings';
+import GradingPolicySettings from './pages/GradingPolicySettings';
 
 // Components
 import NavigationLayout from './components/NavigationLayout';
@@ -134,6 +136,22 @@ function App() {
               element={
                 <PrivateRoute>
                   <AddSchoolAdmin />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/academic-year-settings"
+              element={
+                <PrivateRoute>
+                  <AcademicYearSettings />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/grading-policy-settings"
+              element={
+                <PrivateRoute>
+                  <GradingPolicySettings />
                 </PrivateRoute>
               }
             />

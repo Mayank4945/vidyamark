@@ -107,6 +107,16 @@ const NavigationLayout: React.FC = () => {
       onClick: () => navigate('/reports')
     },
     {
+      key: '/academic-year-settings',
+      label: '📅 Academic Years',
+      onClick: () => navigate('/academic-year-settings')
+    },
+    {
+      key: '/grading-policy-settings',
+      label: '📊 Grading Policies',
+      onClick: () => navigate('/grading-policy-settings')
+    },
+    {
       key: '/settings',
       label: '⚙️ Settings',
       onClick: () => navigate('/settings')
@@ -139,6 +149,16 @@ const NavigationLayout: React.FC = () => {
       key: '/reports',
       label: '📈 Reports',
       onClick: () => navigate('/reports')
+    },
+    {
+      key: '/academic-year-settings',
+      label: '📅 Academic Years',
+      onClick: () => navigate('/academic-year-settings')
+    },
+    {
+      key: '/grading-policy-settings',
+      label: '📊 Grading Policies',
+      onClick: () => navigate('/grading-policy-settings')
     },
     {
       key: '/settings',
