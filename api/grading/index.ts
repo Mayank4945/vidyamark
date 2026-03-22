@@ -633,8 +633,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   const userSchoolId = decoded.schoolId;
   const userRole = decoded.role;
 
-  // Only admins and principals can manage grading system
-  if (userRole !== 'admin' && userRole !== 'principal') {
+  // Only admins, principals, and school admins can manage grading system
+  if (userRole !== 'admin' && userRole !== 'principal' && userRole !== 'school_admin') {
     return res.status(403).json({ error: 'Forbidden: Only admins can manage grading system' });
   }
 
