@@ -11,12 +11,30 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   // Allow public access for GET (reading schools for registration form)
   if (req.method === 'GET') {
     try {
-      const result = await query('SELECT id, name, principal, phone, address FROM schools ORDER BY name');
-      res.json({
-        success: true,
-        data: result.rows,
-        count: result.rows.length
-      });
+      // Check if specific school ID is requested (from query param or route)
+      const schoolId = req.query.id as string;
+      
+      if (schoolId) {
+        // Get specific school by ID
+        const result = await query(
+          'SELECT id, name, principal, phone, address, created_at FROM schools WHERE id = $1',
+          [schoolId]
+        );
+        
+        if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'School not found' });
+        }
+        
+        return res.json({ success: true, data: result.rows[0] });
+      } else {
+        // Get all schools
+        const result = await query('SELECT id, name, principal, phone, address FROM schools ORDER BY name');
+        return res.json({
+          success: true,
+          data: result.rows,
+          count: result.rows.length
+        });
+      }
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

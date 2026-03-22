@@ -173,7 +173,7 @@ class APIClient {
   }
 
   getSchoolById(schoolId: number) {
-    return this.client.get(`/schools/${schoolId}`);
+    return this.client.get(`/schools?id=${schoolId}`);
   }
 
   createSchool(data: any) {
