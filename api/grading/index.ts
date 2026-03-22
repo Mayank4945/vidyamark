@@ -611,6 +611,19 @@ async function handleGradesGET(req: VercelRequest, res: VercelResponse, decoded:
 // ============================================================================
 
 export default async (req: VercelRequest, res: VercelResponse) => {
+  const resource = req.query.resource as string || 'academic-years';
+
+  // Health check endpoint - no auth required
+  if (resource === 'health') {
+    return res.status(200).json({
+      status: 'OK',
+      message: '🎓 VidyaMark API is live and ready to serve!',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+      environment: process.env.NODE_ENV || 'production'
+    });
+  }
+
   const token = extractToken(req.headers.authorization);
   const decoded = verifyToken(token);
   if (!token || !decoded) {
@@ -624,8 +637,6 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   if (userRole !== 'admin' && userRole !== 'principal') {
     return res.status(403).json({ error: 'Forbidden: Only admins can manage grading system' });
   }
-
-  const resource = req.query.resource as string || 'academic-years';
 
   try {
     if (resource === 'academic-years') {
