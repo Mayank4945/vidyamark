@@ -48,9 +48,9 @@ const NavigationLayout: React.FC = () => {
       onClick: () => navigate('/schools')
     },
     {
-      key: '/users',
+      key: '/user-management',
       label: '👥 User Management',
-      onClick: () => navigate('/users')
+      onClick: () => navigate('/user-management')
     },
     {
       key: '/user-requests',

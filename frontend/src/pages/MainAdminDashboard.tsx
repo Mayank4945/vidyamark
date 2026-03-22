@@ -41,7 +41,7 @@ const MainAdminDashboard: React.FC = () => {
 
       // Fetch schools
       const schoolsResponse = await api.getSchools();
-      const schools = schoolsResponse.data || [];
+      const schools = schoolsResponse.data?.data || [];
 
       // Fetch users to count teachers
       const usersResponse = await api.getUsers();
@@ -56,7 +56,7 @@ const MainAdminDashboard: React.FC = () => {
       let recentReqs: any[] = [];
       try {
         const requestsResponse = await api.getUserRequests();
-        const allRequests = requestsResponse.data || [];
+        const allRequests = requestsResponse.data?.data || [];
         recentReqs = allRequests
           .filter((r: any) => r.status === 'pending')
           .slice(0, 5);
