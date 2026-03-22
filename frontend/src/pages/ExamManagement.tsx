@@ -28,6 +28,8 @@ const ExamManagement: React.FC = () => {
   const [exams, setExams] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
+  const [academicYears, setAcademicYears] = useState<any[]>([]);
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState<number | null>(null);
   const [formVisible, setFormVisible] = useState(false);
   const [analyzeModalVisible, setAnalyzeModalVisible] = useState(false);
   const [selectedAnalyzeExam, setSelectedAnalyzeExam] = useState<any>(null);
@@ -40,10 +42,27 @@ const ExamManagement: React.FC = () => {
   const examTypes = ['Midterm', 'Final', 'Unit Test', 'Surprise Test', 'Practical'];
 
   useEffect(() => {
+    fetchAcademicYears();
     fetchExams();
     fetchSubjects();
     fetchClasses();
   }, []);
+
+  const fetchAcademicYears = async () => {
+    try {
+      const response = await api.getAcademicYears();
+      const years = response.data || [];
+      setAcademicYears(years);
+      const activeYear = years.find((ay: any) => ay.is_active);
+      if (activeYear) {
+        setSelectedAcademicYear(activeYear.id);
+      } else if (years.length > 0) {
+        setSelectedAcademicYear(years[0].id);
+      }
+    } catch (error) {
+      message.error('Failed to load academic years');
+    }
+  };
 
   const fetchClasses = async () => {
     try {
@@ -86,7 +105,8 @@ const ExamManagement: React.FC = () => {
       setLoading(true);
       const examData = {
         ...values,
-        examDate: values.examDate.format('YYYY-MM-DD')
+        examDate: values.examDate.format('YYYY-MM-DD'),
+        academicYearId: values.academicYearId || selectedAcademicYear
       };
 
       if (editingExam) {
@@ -115,7 +135,8 @@ const ExamManagement: React.FC = () => {
       examDate: dayjs(exam.exam_date),
       maxMarks: exam.max_marks,
       passingMarks: exam.passing_marks,
-      description: exam.description
+      description: exam.description,
+      academicYearId: exam.academic_year_id || selectedAcademicYear
     });
     setFormVisible(true);
   };
@@ -345,6 +366,21 @@ const ExamManagement: React.FC = () => {
               {subjects.map((subject: any) => (
                 <Select.Option key={subject.id} value={subject.id}>
                   {subject.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Academic Year"
+            name="academicYearId"
+            initialValue={selectedAcademicYear}
+            rules={[{ required: true, message: 'Please select academic year' }]}
+          >
+            <Select placeholder="Select academic year">
+              {academicYears.map((year: any) => (
+                <Select.Option key={year.id} value={year.id}>
+                  {year.name} {year.is_active ? '(Active)' : ''}
                 </Select.Option>
               ))}
             </Select>
