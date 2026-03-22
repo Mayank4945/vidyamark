@@ -50,10 +50,6 @@ class APIClient {
     return this.client.post('/auth/login', { email, password });
   }
 
-  register(email: string, password: string, firstName: string, lastName: string, schoolId?: number, role?: string) {
-    return this.client.post('/auth/register', { email, password, firstName, lastName, schoolId, role });
-  }
-
   // Student endpoints
   getStudents(classId: number) {
     return this.client.get(`/students?classId=${classId}`);
@@ -190,10 +186,6 @@ class APIClient {
     return this.client.get(`/subjects`);
   }
 
-  seedSubjects() {
-    return this.client.post('/subjects/seed', {});
-  }
-
   createSubject(data: any) {
     return this.client.post('/subjects', data);
   }
@@ -204,10 +196,6 @@ class APIClient {
 
   deleteSubject(subjectId: number) {
     return this.client.delete(`/subjects/${subjectId}`);
-  }
-
-  seedDefaultSubjects() {
-    return this.client.post(`/subjects/seed`, {});
   }
 
   // User Request Endpoints (Registration Requests)

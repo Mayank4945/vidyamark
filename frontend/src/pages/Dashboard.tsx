@@ -31,7 +31,6 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchClasses();
-    autoSeedSubjects();
   }, []);
 
   useEffect(() => {
@@ -84,20 +83,6 @@ const Dashboard: React.FC = () => {
       message.error('Failed to load students');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const autoSeedSubjects = async () => {
-    try {
-      // Automatically seed subjects on first app load if they don't exist
-      const subjectsResponse = await api.getSubjects();
-      if (!subjectsResponse.data.data || subjectsResponse.data.data.length === 0) {
-        console.log('No subjects found, seeding default subjects...');
-        await api.seedSubjects();
-        console.log('Subjects seeded successfully');
-      }
-    } catch (error: any) {
-      console.log('Subjects already exist or error:', error.message);
     }
   };
 
