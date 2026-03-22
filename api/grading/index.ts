@@ -297,20 +297,19 @@ async function handleGradingPoliciesGET(req: VercelRequest, res: VercelResponse,
         gp.created_at,
         gp.updated_at,
         COALESCE(
-          json_agg(
-            json_build_object(
-              'id', etw.id,
-              'exam_type', etw.exam_type,
-              'display_name', etw.display_name,
-              'weight_percentage', etw.weight_percentage,
-              'sequence_order', etw.sequence_order
-            ) ORDER BY etw.sequence_order
-          ) FILTER (WHERE etw.id IS NOT NULL),
+          (SELECT json_agg(json_build_object(
+            'id', id,
+            'exam_type', exam_type,
+            'display_name', display_name,
+            'weight_percentage', weight_percentage,
+            'sequence_order', sequence_order
+          ) ORDER BY sequence_order)
+          FROM exam_type_weightages
+          WHERE grading_policy_id = gp.id),
           '[]'::json
         ) as weightages
       FROM grading_policies gp
       LEFT JOIN academic_years ay ON gp.academic_year_id = ay.id
-      LEFT JOIN exam_type_weightages etw ON gp.id = etw.grading_policy_id
       WHERE gp.school_id = $1
     `;
 
@@ -321,8 +320,7 @@ async function handleGradingPoliciesGET(req: VercelRequest, res: VercelResponse,
       params.push(academicYearId);
     }
 
-    sql += ` GROUP BY gp.id, gp.name, gp.description, gp.academic_year_id, ay.name, gp.is_active, gp.created_at, gp.updated_at
-             ORDER BY ay.created_at DESC, gp.created_at DESC`;
+    sql += ` ORDER BY ay.created_at DESC, gp.created_at DESC`;
 
     const result = await query(sql, params);
     res.json({ success: true, data: result.rows });
