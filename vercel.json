@@ -14,11 +14,15 @@
       "dest": "/api/$1"
     },
     {
-      "src": "^/static/(.*)",
-      "dest": "^/static/$1"
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
     },
     {
-      "src": ".*",
+      "src": "/(.*\\.[a-zA-Z0-9]+)$",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(?!api/)",
       "dest": "/index.html"
     }
   ]
